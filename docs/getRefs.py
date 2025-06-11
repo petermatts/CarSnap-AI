@@ -7,6 +7,7 @@ directory
 from pathlib import Path
 import requests
 import os
+import re
 
 # references are a key value pair: key=name of paper, value=url to paper pdf
 Papers = {
@@ -18,6 +19,10 @@ Papers = {
     "Distilling the Knowledge in a Neural Network": "https://arxiv.org/pdf/1503.02531",
     "Deep Learning Based Vehicle Make-Model Classification": "https://arxiv.org/pdf/1809.00953",
     "Enhancing Vehicle Make and Model Recognitio with 3D Attention Modules": "https://arxiv.org/pdf/2502.15398",
+    "Federated learning Applications, challenges and future directions": "https://arxiv.org/pdf/2205.09513",
+    "Communication-Efficient Learning of Deep Networks from Decentralized Data": "https://arxiv.org/pdf/1602.05629", # intro paper for FL
+    "You Only Look Once Unified, Real-Time Object Detection": "https://arxiv.org/pdf/1506.02640",
+    "A Comprhensive Review of YOLO Architectures In Computer Vision From YOLOv1 to YOLOv8 and YOLO-NAS": "https://arxiv.org/pdf/2304.00501",
 
     # dataset papers
     "Car-1000 A New Large Scale Fine-Grained Visual Categorization Dataset": "https://arxiv.org/pdf/2503.12385",
@@ -32,13 +37,14 @@ os.makedirs(BASE_PATH, exist_ok=True)
 downloaded = False
 for k, v in Papers.items():
     response = requests.get(v)
-    file_path = BASE_PATH / f'{k.replace(" ", "_")}.pdf'
+    temp = re.sub(r",|\s", "_", k)
+    file_path = BASE_PATH / f'{temp}.pdf'
 
     if os.path.isfile(file_path):
         continue
     else:
         downloaded = True
-        name = (k + '.pdf' if len(k) < 64 else k[:64] + '... .pdf').ljust(72, ' ')
+        name = (k + '.pdf ' if len(k) < 64 else k[:64] + '... .pdf').ljust(72, '.')
         print(f"Getting: {name} ... ", end='')
         with open(file_path, "wb") as f:
             f.write(response.content)
