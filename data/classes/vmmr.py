@@ -1,4 +1,6 @@
-from torch.utils.data import Dataset  # , DataLoader
+from torch.utils.data import Dataset
+from torchvision.io import read_image
+from pathlib import Path
 
 
 class VMMRdb(Dataset):
@@ -8,5 +10,5 @@ class VMMRdb(Dataset):
     def __len__():
         pass  # todo
 
-    def __getitem__(self, index):
+    def __getitem__(self, index: int):
         pass  # todo
