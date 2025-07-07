@@ -18,7 +18,7 @@ DATA_DIR = Path()
 path = os.getenv("DATA_PATH")
 if path is None:
     print(
-        f"No DATA_PATH env variable detected. Datasets will be stored to {DATA_DIR.absolute()}")
+        f"No DATA_PATH env variable detected. Datasets will be saved to {DATA_DIR.absolute()}")
 else:
     print(f"Found DATA_PATH env. Datasets will be saved to {path}")
     DATA_DIR = Path(path)

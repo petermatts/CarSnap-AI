@@ -15,6 +15,7 @@ Notes on specifications of the datasets we are using including:
 - ? classes (brand, model, year, color)
 - 300x300 px
 - UK Market
+- JPG format
 
 ## [Stanford Cars](https://pytorch.org/vision/main/generated/torchvision.datasets.StanfordCars.html)
 
@@ -32,6 +33,7 @@ Notes on specifications of the datasets we are using including:
 - 9170 classes (make, model, year)
 - 1950 - 2016
 - US market
+- JPG format
 
 
 ## [Car-1000](https://arxiv.org/pdf/2503.12385)
