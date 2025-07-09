@@ -29,6 +29,8 @@ class DatasetNames(StrEnum):
     STANFORD = "STANFORD"
     DMV = "DMV"
     VMMR = "VMMR"
+    COMPCARS = "COMPCARS"
+    VEHICLEID = "VEHICLEID"
 
 
 def download(url, dest_path, chunk_size=1024):
@@ -122,6 +124,23 @@ def download_and_extract_vmmrdb():
     data_file.unlink()
 
 
+def download_and_extract_compcars():
+    dataset_dir = DATA_DIR / DatasetNames.COMPCARS.value
+    if not dataset_dir.exists():
+        dataset_dir.mkdir(parents=True)
+
+    data_file = dataset_dir / "data.zip"
+    if not os.path.exists(data_file):
+        url = URL(
+            "https://www.dropbox.com/sh/46de2cre37fvzu6/AABXtX8QqA6sx37k1IyZmNQ2a?dl=1")
+        download(url, data_file)
+    else:
+        print("File exists. Skipping download.")
+
+    extract(data_file, dataset_dir)
+    data_file.unlink()
+
+
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     ds = parser.add_mutually_exclusive_group(required=True)
@@ -132,13 +151,16 @@ if __name__ == "__main__":
                     const=DatasetNames.DMV.value, help="Downloads the DMV Cars dataset")
     ds.add_argument("--vmmr", action="store_const", dest="ds",
                     const=DatasetNames.VMMR.value, help="Downloads the VMMR dataset")
+    ds.add_argument("--compcars", action="store_const", dest="ds",
+                    const=DatasetNames.COMPCARS.value, help="Downloads the CompCars dataset")
 
     args = parser.parse_args()
 
     download_map = {
         DatasetNames.STANFORD.value: download_and_extract_stanford_cars,
         DatasetNames.DMV.value: download_and_extract_dmv_cars,
-        DatasetNames.VMMR.value: download_and_extract_vmmrdb
+        DatasetNames.VMMR.value: download_and_extract_vmmrdb,
+        DatasetNames.COMPCARS.value: download_and_extract_compcars,
     }
 
     download_map[args.ds]()
