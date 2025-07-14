@@ -25,11 +25,11 @@ Run `getRefs.py` to download and save all reference research papers that we use/
 
 ## Datasets
 
-See [Datasets.md](./docs/Datasets.md) for more details.
+See [Datasets.md](./data/Datasets.md) for more details.
 
 ## Model Architectures
 
-See [Models.md](./docs/Models.md) for more details.
+See [Models.md](./models/Models.md) for more details.
 
 ## Training
 

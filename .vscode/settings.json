@@ -14,5 +14,14 @@
         "data/STANFORD": true,
         "data/DMV": true,
         "data/VMMR": true,
+    },
+    "search.exclude": {
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true,
+
+        "data/STANFORD": true,
+        "data/DMV": true,
+        "data/VMMR": true,
     }
 }
