@@ -11,15 +11,17 @@ from pandas import read_csv, DataFrame
 
 
 class VMMRdb(Dataset):
-    def __init__(self, transform: Compose = None, label_mode: str = 'brand'):
+    def __init__(self, transform: Compose = None, label_mode: str = 'brand', clean: bool = False):
         assert label_mode in ['all', 'brand', 'model', 'year']
         load_dotenv(Path(__file__).parent / "../../.env")
 
         self.INDEX_PATH = Path("./VMMR.csv")
-        self.root_dir = Path(os.getenv("DATA_PATH") or ".").absolute() / "VMMR"
+        self.root_dir = Path(os.getenv("DATA_PATH")
+                             or "..").absolute() / "VMMR"
 
         self.transforms = transform
         self.label_mode = label_mode
+        self.clean = clean
 
         self.image_files = self._index_file()
 
@@ -41,10 +43,11 @@ class VMMRdb(Dataset):
         return image, label
 
     def _index_file(self) -> DataFrame:
-        if self.INDEX_PATH.exists():
+        if self.INDEX_PATH.exists() and not self.clean:
+            print("AAA")
             return read_csv(self.INDEX_PATH, dtype=str)
         else:
-            paths = glob("../VMMR/**/*.jpg", recursive=True)
+            paths = glob(f"{self.root_dir}/**/*.jpg", recursive=True)
             brand, model, trim, year = list(
                 zip(*(map(lambda x: self._parse(x), paths))))
             paths = list(map(lambda x: Path(x).absolute().resolve(), paths))

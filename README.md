@@ -8,7 +8,7 @@ In the root directory of the project create a `.env` file and define the folowin
 | Variable  | Description                                              | If Not Defined                         |
 | --------- | -------------------------------------------------------- | -------------------------------------- |
 | DATA_PATH | Sets the save path when downloading and loading datasets | Path defaules to project `data` folder |
-|||
+| SEED      | Sets the RNG seed val to be used when setting RNG seeds  |                                        |
 
 ## Storage Requirements
 

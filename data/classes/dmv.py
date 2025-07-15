@@ -16,7 +16,7 @@ class DMV_Cars(Dataset):
         load_dotenv(Path(__file__).parent / "../../.env")
 
         self.INDEX_PATH = Path("./DMV.csv")
-        self.root_dir = Path(os.getenv("DATA_PATH") or ".").absolute() / "VMMR"
+        self.root_dir = Path(os.getenv("DATA_PATH") or "..").absolute() / "DMV"
 
         self.transforms = transform
         self.label_mode = label_mode
@@ -45,7 +45,7 @@ class DMV_Cars(Dataset):
         if self.INDEX_PATH.exists():
             return read_csv(self.INDEX_PATH, dtype=str)
         else:
-            paths = glob("../DMV/**/*.jpg", recursive=True)
+            paths = glob(f"{self.root_dir}/**/*.jpg", recursive=True)
             brand, model, year, color = list(
                 zip(*(map(lambda x: self._parse(x), paths))))
             paths = list(map(lambda x: Path(x).absolute().resolve(), paths))
