@@ -90,6 +90,12 @@ def download_and_extract_stanford_cars():
     ds = load_dataset("tanganke/stanford_cars")
     ds.save_to_disk(DATA_DIR / "STANFORD")
 
+    # todo make this more usable
+    # https://raw.githubusercontent.com/ouceduxzk/Fine_Grained_Classification/master/devkit/cars_meta.mat
+    # https://raw.githubusercontent.com/ouceduxzk/Fine_Grained_Classification/master/devkit/cars_train_annos.mat
+    # https://raw.githubusercontent.com/ouceduxzk/Fine_Grained_Classification/master/devkit/cars_test_annos.mat
+    # to load the files do scipy.io.loadmat(file)
+
 
 def download_and_extract_dmv_cars():
     dataset_dir = DATA_DIR / DatasetNames.DMV.value
