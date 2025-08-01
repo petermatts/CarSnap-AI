@@ -6,7 +6,7 @@ path = Path(__file__)
 # full path, resolve call handles things like ../
 print(path.resolve().absolute())
 
-# just this file
+# just this file/directory
 print(path.name)
 
 # file extension
@@ -20,6 +20,15 @@ print(path.cwd())
 
 # checks if the path exists
 print(path.exists())
+
+# checks if the path is file
+print(path.is_file())
+
+# checks if the path is a directory
+print(path.is_dir())
+
+# creates the current directory
+path.mkdir(parents=True, exist_ok=True)
 
 # fill in more as needed...
 

@@ -131,6 +131,8 @@ def download_and_extract_vmmrdb():
 
 
 def download_and_extract_compcars():
+    print("Drop box link currently does not work, come back to fix this another time")
+    return
     dataset_dir = DATA_DIR / DatasetNames.COMPCARS.value
     if not dataset_dir.exists():
         dataset_dir.mkdir(parents=True)
