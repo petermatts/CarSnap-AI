@@ -1,0 +1,8 @@
+dataset: null
+name: null
+lr: 0.001
+optimizer: Adam
+split:
+    - 80
+    - 10
+    - 10
