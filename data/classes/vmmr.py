@@ -15,10 +15,10 @@ class VMMRdb(Dataset):
         assert label_mode in ['all', 'brand', 'model', 'year']
         load_dotenv(Path(__file__).parent / "../../.env")
 
-        self.CSV_PATH = Path("./VMMR.csv")
-        self.YML_PATH = Path("./VMMR.yml")
+        self.CSV_PATH = Path(__file__).parent / "./VMMR.csv"
+        self.YML_PATH = Path(__file__).parent / "./VMMR.yml"
         self.root_dir = Path(os.getenv("DATA_PATH")
-                             or "..").absolute() / "VMMR"
+                             or str(Path(__file__).parent.parent)).absolute() / "VMMR"
 
         self.transforms = transform
         self.label_mode = label_mode

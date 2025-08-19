@@ -135,6 +135,9 @@ class Trainer:
         plt.tight_layout()
         plt.show()
 
+    def learn(self):  # just for funzies
+        self.train()
+
     def train(self):
         best_val_loss = float('inf')
         patience_counter = 0

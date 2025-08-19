@@ -15,9 +15,10 @@ class DMV_Cars(Dataset):
         assert label_mode in ['all', 'brand', 'model', 'year']
         load_dotenv(Path(__file__).parent / "../../.env")
 
-        self.CSV_PATH = Path("./DMV.csv")
-        self.YML_PATH = Path("./DMV.yml")
-        self.root_dir = Path(os.getenv("DATA_PATH") or "..").absolute() / "DMV"
+        self.CSV_PATH = Path(__file__).parent / "DMV.csv"
+        self.YML_PATH = Path(__file__).parent / "DMV.yml"
+        self.root_dir = Path(os.getenv("DATA_PATH")
+                             or str(Path(__file__).parent.parent)).absolute() / "DMV"
 
         self.transforms = transform
         self.label_mode = label_mode

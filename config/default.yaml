@@ -3,6 +3,6 @@ name: null
 lr: 0.001
 optimizer: Adam
 split:
-    - 80
-    - 10
-    - 10
+    train: 80
+    val: 10
+    test: 10

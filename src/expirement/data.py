@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from pathlib import Path
 
 
-def getDataSplit(dataset: Dataset, batch_size: int = 64, ret_dataset: bool = False) -> tuple:
+def getDataSplit(dataset: Dataset, batch_size: int = 64, ret_dataset: bool = False) -> tuple[DataLoader]:
     load_dotenv(Path(__file__).parent / "../../.env")
-    seed = os.getenv("SEED")
+    seed = int(os.getenv("SEED"))
     if seed is not None:
         np.random.seed(seed)
     else:
