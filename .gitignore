@@ -1,6 +1,6 @@
 # Manual additions
 *.pdf
-chat.md
+docs/notes
 
 ## Default Python gitignores
 

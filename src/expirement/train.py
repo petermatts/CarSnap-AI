@@ -147,6 +147,7 @@ class Trainer:
             running_loss = 0.0
 
             for inputs, targets in tqdm(self.train_loader, desc=f"Epoch {epoch}/{self.num_epochs}"):
+                print(targets)  # todo return indices instead of strings
                 inputs, targets = inputs.to(
                     self.device), targets.to(self.device)
 

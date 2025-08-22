@@ -23,5 +23,6 @@
         "data/STANFORD": true,
         "data/DMV": true,
         "data/VMMR": true,
-    }
+    },
+    "terminal.integrated.defaultProfile.windows": "PowerShell"
 }

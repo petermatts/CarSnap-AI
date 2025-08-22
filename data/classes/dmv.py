@@ -6,56 +6,58 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from glob import glob
-import yaml
+import numpy as np
 from pandas import read_csv, DataFrame
 
 
 class DMV_Cars(Dataset):
-    def __init__(self, transform: Compose = None, label_mode: str = 'brand', clean: bool = False):
-        assert label_mode in ['all', 'brand', 'model', 'year']
+    def __init__(self, transform: Compose = None, clean: bool = False):
         load_dotenv(Path(__file__).parent / "../../.env")
 
         self.CSV_PATH = Path(__file__).parent / "DMV.csv"
-        self.YML_PATH = Path(__file__).parent / "DMV.yml"
+        self.NPZ_PATH = Path(__file__).parent / "DMV.npz"
         self.root_dir = Path(os.getenv("DATA_PATH")
                              or str(Path(__file__).parent.parent)).absolute() / "DMV"
 
         self.transforms = transform
-        self.label_mode = label_mode
         self.clean = clean
 
-        self.image_files = self._index_file()
+        self.image_files, self.classes = self._index_file()
 
-    def num_classes(self) -> int:
-        with open(self.YML_PATH, "r") as f:
-            specs = yaml.safe_load(f)
-
-        if self.label_mode == "all":
-            return len(specs["Colors"])*len(specs["Years"])*len(specs["Brands"])*len(specs["Models"])
-        else:
-            return len(specs[f"{self.label_mode.capitalize()}s"])
+    def num_classes(self) -> tuple[int]:
+        return (
+            len(self.classes["Brands"]),
+            len(self.classes["Models"]),
+            len(self.classes["Years"]),
+            len(self.classes["Colors"])
+        )
 
     def __len__(self) -> int:
         return len(self.image_files)
 
-    def __getitem__(self, index: int) -> tuple[Tensor, str | tuple[str]]:
+    def __getitem__(self, index: int) -> tuple[Tensor, tuple[Tensor, ...]]:
         data = self.image_files.iloc[index]
         image = decode_image(data["Image"])
-        if self.label_mode == "all":  # ? return a tuple instead
-            label = (data["Color"], data["Year"], data["Brand"], data["Model"])
-        else:
-            label = data[self.label_mode.capitalize()]
+
+        label = (
+            Tensor(1*(self.classes["Brands"] == data["Brand"])),
+            Tensor(1*(self.classes["Models"] == data["Model"])),
+            Tensor(1*(self.classes["Years"] == data["Year"])),
+            Tensor(1*(self.classes["Colors"] == data["Color"]))
+        )
 
         if self.transforms is not None:
             image = self.transforms(image)
 
         return image, label
 
-    def _index_file(self) -> DataFrame:
+    def _index_file(self) -> tuple[DataFrame, dict]:
         if self.CSV_PATH.exists() and not self.clean:
             df = read_csv(self.CSV_PATH, dtype=str).fillna("")
-            if not self.YML_PATH.exists():
-                self._write_yaml(df)
+            if not self.NPZ_PATH.exists():
+                data = self._write_npz(df)
+            else:
+                data = np.load(self.NPZ_PATH)
         else:
             paths = glob(f"{self.root_dir}/**/*.jpg", recursive=True)
             brand, model, year, color = list(
@@ -70,20 +72,23 @@ class DMV_Cars(Dataset):
                 "Color": color
             }, dtype=str)
 
-            self._write_yaml(df)
+            data = self._write_npz(df)
 
             df.to_csv(self.CSV_PATH, index=False)
 
-        return df
+        return df, data
 
-    def _write_yaml(self, df: DataFrame) -> None:
-        with open(self.YML_PATH, "w") as f:
-            yaml.safe_dump({
-                "Brands": df["Brand"].unique().tolist(),
-                "Models": df["Model"].unique().tolist(),
-                "Years": df["Year"].unique().tolist(),
-                "Colors": df["Color"].unique().tolist()
-            }, f)
+    def _write_npz(self, df: DataFrame) -> dict:
+        data = {
+            "Brands": np.array(df["Brand"].unique().tolist()),
+            "Models": np.array(df["Model"].unique().tolist()),
+            "Years": np.array(df["Year"].unique().tolist()),
+            "Colors": np.array(df["Color"].unique().tolist())
+        }
+        np.savez(self.NPZ_PATH, Brands=data["Brands"],
+                 Models=data["Models"], Years=data["Years"], Colors=data["Colors"])
+
+        return data
 
     def _parse(self, path: str) -> tuple[str]:
         p = Path(path)
@@ -97,8 +102,8 @@ class DMV_Cars(Dataset):
 
 
 if __name__ == "__main__":
-    ds = DMV_Cars(label_mode="all")
+    # ds = DMV_Cars(clean=True)
+    ds = DMV_Cars()
     print(ds.image_files.iloc[0])
     print(ds.image_files.iloc[0]["Image"])
-    print(ds.__getitem__(0)[1])
     print(ds.num_classes())
