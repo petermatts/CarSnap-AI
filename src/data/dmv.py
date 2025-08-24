@@ -1,4 +1,4 @@
-from torch import Tensor, load
+from torch import Tensor, load, float32
 from torch.utils.data import Dataset
 from torchvision.io import decode_image
 from torchvision.transforms import Compose
@@ -8,7 +8,10 @@ import os
 from glob import glob
 import numpy as np
 from pandas import read_csv, DataFrame
-from .stats import getImageStats
+if __package__ or "." in __name__:
+    from .stats import getImageStats
+else:
+    from stats import getImageStats
 
 
 class DMV_Cars(Dataset):
@@ -38,7 +41,7 @@ class DMV_Cars(Dataset):
 
     def __getitem__(self, index: int) -> tuple[Tensor, tuple[Tensor, ...]]:
         data = self.image_files.iloc[index]
-        image = decode_image(data["Image"])
+        image = decode_image(data["Image"]).to(float32)
 
         label = (
             Tensor(1*(self.classes["Brands"] == data["Brand"])),
@@ -123,4 +126,4 @@ if __name__ == "__main__":
     # print(item)
     # print(targets)
 
-    DMV_Cars.getStats()
+    print(DMV_Cars.getStats())

@@ -19,17 +19,16 @@ class VIT(nn.Module):
 
         self.vit.heads = nn.Identity()  # remove existing classification head
 
-        self.classifiers = []
-        for nclass in self.num_classes:
-            self.classifiers.append(nn.Sequential(
+        self.classifiers = nn.ModuleList([
+            nn.Sequential(
                 nn.Linear(768, self.latent_dim),
                 nn.ReLU(),
-                nn.Linear(self.latent_dim, nclass),
-                nn.Softmax()
-            ))
+                nn.Linear(self.latent_dim, num_classes),
+                nn.Softmax(dim=1)
+            ) for num_classes in self.num_classes
+        ])
 
     def forward(self, x):
-        print(x)
         features = self.vit(x)
-        out = self.classifier(features)  # ! incorrect
+        out = [classifier(features) for classifier in self.classifiers]
         return out

@@ -67,7 +67,7 @@ class Trainer:
                 'model_state': self.model.state_dict(),
                 'optimizer_state': self.optimizer.state_dict(),
                 'best_val_loss': best_val_loss
-            }, self.checkpoint_path)
+            }, self.checkpoint_path)  # ! seperate files per checkpoint?
 
     def _validate(self):
         self.model.eval()
@@ -79,12 +79,19 @@ class Trainer:
 
         with torch.no_grad():
             for inputs, targets in self.val_loader:
-                inputs, targets = inputs.to(
-                    self.device), targets.to(self.device)
+                if not isinstance(targets, (list, tuple)):
+                    targets = [targets.to(self.device)]
+                else:
+                    for i, t in enumerate(targets):
+                        targets[i] = t.to(self.device)
+
                 with torch.amp.autocast(str(self.device), enabled=self.use_amp):
                     outputs = self.model(inputs)
-                    loss = self.loss_fn(outputs, targets)
-
+                    if not isinstance(outputs, (list, tuple)):
+                        outputs = [outputs]
+                    losses = [self.loss_fn(o, t)
+                              for o, t in zip(outputs, targets)]
+                loss = sum(losses)
                 total_loss += loss.item() * inputs.size(0)
                 _, preds = torch.max(outputs, dim=1)
                 all_preds.extend(preds.cpu().numpy())
@@ -148,22 +155,22 @@ class Trainer:
             running_loss = 0.0
 
             for inputs, targets in tqdm(self.train_loader, desc=f"Epoch {epoch}/{self.num_epochs}"):
-                # print(targets)  # todo return indices instead of strings
-                # inputs, targets = inputs.to(
-                #     self.device), targets.to(self.device)
-
                 inputs = inputs.to(self.device)
-                if isinstance(targets, Iterable):
+                if not isinstance(targets, (list, tuple)):
+                    targets = [targets.to(self.device)]
+                else:
                     for i, t in enumerate(targets):
                         targets[i] = t.to(self.device)
-                else:
-                    targets = targets.to(self.device)
 
                 self.optimizer.zero_grad()
                 with torch.amp.autocast(str(self.device), enabled=self.use_amp):
                     outputs = self.model(inputs)
-                    loss = self.loss_fn(outputs, targets)
+                    if not isinstance(outputs, (list, tuple)):
+                        outputs = [outputs]
+                    losses = [self.loss_fn(o, t)
+                              for o, t in zip(outputs, targets)]
 
+                loss = sum(losses)
                 self.scaler.scale(loss).backward()
                 self.scaler.step(self.optimizer)
                 self.scaler.update()

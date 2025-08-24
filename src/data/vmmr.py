@@ -1,4 +1,4 @@
-from torch import Tensor
+from torch import Tensor, load, float32
 from torch.utils.data import Dataset
 from torchvision.io import decode_image
 from torchvision.transforms import Compose
@@ -8,6 +8,10 @@ import os
 from glob import glob
 import numpy as np
 from pandas import read_csv, DataFrame
+if __package__ or "." in __name__:
+    from .stats import getImageStats
+else:
+    from stats import getImageStats
 
 
 class VMMRdb(Dataset):
@@ -23,7 +27,6 @@ class VMMRdb(Dataset):
         self.clean = clean
 
         self.image_files, self.classes = self._index_file()
-        print(self.classes)
 
     def num_classes(self) -> int:
         return (
@@ -38,7 +41,7 @@ class VMMRdb(Dataset):
 
     def __getitem__(self, index: int) -> tuple[Tensor, tuple[Tensor, ...]]:
         data = self.image_files.iloc[index]
-        image = decode_image(data["Image"])
+        image = decode_image(data["Image"]).to(float32)
 
         label = (
             Tensor(1*(self.classes["Brands"] == data["Brand"])),
@@ -102,6 +105,17 @@ class VMMRdb(Dataset):
         else:
             print(f"Unexpected model: {parts}")
 
+    @staticmethod
+    def getStats() -> tuple[Tensor, Tensor]:
+        """Returns the mean and standard deviation of the dataset"""
+        pt_path = Path(__file__).parent / "VMMR.pt"
+        if pt_path.exists():
+            stats = load(pt_path)
+        else:
+            stats = getImageStats("DMV")
+
+        return stats['mean'], stats['stdv']
+
 
 if __name__ == "__main__":
     # ds = VMMRdb(clean=True)
@@ -109,3 +123,8 @@ if __name__ == "__main__":
     print(ds.image_files.iloc[0])
     print(ds.image_files.iloc[0]["Image"])
     print(ds.num_classes())
+    item, targets = ds.__getitem__(0)
+    # print(item)
+    # print(targets)
+
+    print(VMMRdb.getStats())
