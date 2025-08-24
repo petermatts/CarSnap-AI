@@ -1,6 +1,10 @@
 # Manual additions
 *.pdf
 docs/notes
+*.csv
+*.npz
+*.pt
+src/data/*.yml
 
 ## Default Python gitignores
 

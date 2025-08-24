@@ -15,12 +15,12 @@ class DatasetNames(StrEnum):
     VEHICLEID = "VEHICLEID"
 
 
-def getImageStats(dataset: str) -> None:
+def getImageStats(dataset: str) -> tuple[torch.Tensor, torch.Tensor]:
     """
     Given a dataset, writes the key dataset statistics
     """
 
-    csv_path = Path(f'./classes/{dataset}.csv')
+    csv_path = Path(__file__).parent / f'{dataset}.csv'
     if not csv_path.exists():
         raise FileNotFoundError(f"{csv_path.absolute()}")
 
@@ -41,6 +41,8 @@ def getImageStats(dataset: str) -> None:
     V /= len(image_paths)
 
     torch.save({"mean": M, "stdv": V}, Path(f"./classes/{dataset}.pt"))
+
+    return M, V
 
 
 if __name__ == "__main__":

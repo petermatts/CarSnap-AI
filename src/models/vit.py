@@ -24,10 +24,12 @@ class VIT(nn.Module):
             self.classifiers.append(nn.Sequential(
                 nn.Linear(768, self.latent_dim),
                 nn.ReLU(),
-                nn.Linear(self.latent_dim, nclass)
+                nn.Linear(self.latent_dim, nclass),
+                nn.Softmax()
             ))
 
     def forward(self, x):
+        print(x)
         features = self.vit(x)
         out = self.classifier(features)  # ! incorrect
         return out

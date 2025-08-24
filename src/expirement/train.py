@@ -4,6 +4,7 @@ from torch.utils.data import DataLoader
 import matplotlib.pyplot as plt
 import os
 from tqdm import tqdm
+from typing import Iterable
 
 
 class Trainer:
@@ -80,7 +81,7 @@ class Trainer:
             for inputs, targets in self.val_loader:
                 inputs, targets = inputs.to(
                     self.device), targets.to(self.device)
-                with torch.amp.autocast(enabled=self.use_amp):
+                with torch.amp.autocast(str(self.device), enabled=self.use_amp):
                     outputs = self.model(inputs)
                     loss = self.loss_fn(outputs, targets)
 
@@ -147,12 +148,19 @@ class Trainer:
             running_loss = 0.0
 
             for inputs, targets in tqdm(self.train_loader, desc=f"Epoch {epoch}/{self.num_epochs}"):
-                print(targets)  # todo return indices instead of strings
-                inputs, targets = inputs.to(
-                    self.device), targets.to(self.device)
+                # print(targets)  # todo return indices instead of strings
+                # inputs, targets = inputs.to(
+                #     self.device), targets.to(self.device)
+
+                inputs = inputs.to(self.device)
+                if isinstance(targets, Iterable):
+                    for i, t in enumerate(targets):
+                        targets[i] = t.to(self.device)
+                else:
+                    targets = targets.to(self.device)
 
                 self.optimizer.zero_grad()
-                with torch.amp.autocast(device=self.device, enabled=self.use_amp):
+                with torch.amp.autocast(str(self.device), enabled=self.use_amp):
                     outputs = self.model(inputs)
                     loss = self.loss_fn(outputs, targets)
 

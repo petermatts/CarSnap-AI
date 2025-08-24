@@ -1,12 +1,10 @@
 # the main file for running ML expirements using argparse to specify model, hyperparams, datasets, etc.
 
+import torchvision.transforms.v2 as transforms
 from expirement import getDataSplit, Trainer
-import sys
 from args import make_args
 import yaml
 from pathlib import Path
-sys.path.append(str((Path(__file__).parent / "..").resolve()))
-sys.path.append(str((Path(__file__).parent / "../data").resolve()))
 from data import DMV_Cars  # nopep8
 from models import VIT  # nopep8
 from resources import getOptimizer  # nopep8
@@ -54,7 +52,11 @@ class Config:
 
 
 def expirement(config: Config):
-    dataset = DMV_Cars()
+    transform = transforms.Compose(
+        transforms.Resize((224, 224)),
+        transforms.Normalize(*DMV_Cars.getStats())
+    )
+    dataset = DMV_Cars(transform=transform)
     train, val, test = getDataSplit(dataset, batch_size=1)
 
     model = VIT(num_classes=dataset.num_classes())

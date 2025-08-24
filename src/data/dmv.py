@@ -1,4 +1,4 @@
-from torch import Tensor
+from torch import Tensor, load
 from torch.utils.data import Dataset
 from torchvision.io import decode_image
 from torchvision.transforms import Compose
@@ -8,6 +8,7 @@ import os
 from glob import glob
 import numpy as np
 from pandas import read_csv, DataFrame
+from .stats import getImageStats
 
 
 class DMV_Cars(Dataset):
@@ -100,6 +101,17 @@ class DMV_Cars(Dataset):
 
         return brand, model, year, color
 
+    @staticmethod
+    def getStats() -> tuple[Tensor, Tensor]:
+        """Returns the mean and standard deviation of the dataset"""
+        pt_path = Path(__file__).parent / "DMV.pt"
+        if pt_path.exists():
+            stats = load(pt_path)
+        else:
+            stats = getImageStats("DMV")
+
+        return stats['mean'], stats['stdv']
+
 
 if __name__ == "__main__":
     # ds = DMV_Cars(clean=True)
@@ -107,3 +119,8 @@ if __name__ == "__main__":
     print(ds.image_files.iloc[0])
     print(ds.image_files.iloc[0]["Image"])
     print(ds.num_classes())
+    item, targets = ds.__getitem__(0)
+    # print(item)
+    # print(targets)
+
+    DMV_Cars.getStats()
