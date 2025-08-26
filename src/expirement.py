@@ -53,7 +53,8 @@ class Config:
 
 def expirement(config: Config):
     dev = device("cuda" if cuda.is_available() else "cpu")
-    dataset_class = VMMRdb
+    # dataset_class = VMMRdb
+    dataset_class = DMV_Cars
     mean, stdv = dataset_class.getStats()
 
     transform = transforms.Compose([

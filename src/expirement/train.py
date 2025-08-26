@@ -52,12 +52,12 @@ class Trainer:
 
         if self.plot_loss:
             plt.ion()
-            self.fig, self.ax = plt.subplots()
+            self.fig, self.ax = plt.subplots(nrows=1, ncols=1)
             self.train_line, = self.ax.plot([], [], label="Train Loss")
-            self.val_line, = self.ax.plot([], [], label="Val Loss")
-            self.ax.set_xlabel("Epoch")
+            # self.val_line, = self.ax.plot([], [], label="Val Loss")
+            self.ax.set_xlabel("Steps")
             self.ax.set_ylabel("Loss")
-            self.ax.set_title("Training/Validation Loss")
+            self.ax.set_title("Loss")
             self.ax.legend()
 
     def _save_checkpoint(self, epoch: int, best_val_loss: float):
@@ -124,6 +124,7 @@ class Trainer:
         self.ax.autoscale_view()
         self.fig.canvas.draw()
         self.fig.canvas.flush_events()
+        plt.pause(0.00001)
 
     def _plot_gradients_and_weights(self):
         fig, axes = plt.subplots(2, 1, figsize=(8, 6))
@@ -177,13 +178,18 @@ class Trainer:
 
                 running_loss += loss.item() * inputs.size(0)
 
+                if self.plot_loss:
+                    self.train_losses.append(loss.detach().cpu().numpy())
+                    self._update_plot()
+
             train_loss = running_loss / len(self.train_loader.dataset)
             self.train_losses.append(train_loss)
             print(f"[Epoch {epoch}] Train Loss: {train_loss:.4f}")
 
             if self.val_loader:
                 val_loss, val_acc = self._validate()
-                self.val_losses.append(val_loss)
+                # if self.plot_loss:
+                #     self.val_losses.append(val_loss)
                 print(
                     f"[Epoch {epoch}] Val Loss: {val_loss:.4f} | Val Acc: {val_acc:.4f}")
 
@@ -205,14 +211,14 @@ class Trainer:
                 self.val_losses.append(None)
 
             if self.plot_loss:
-                self._update_plot(epoch)
+                self._update_plot()
 
         if self.plot_loss:
             plt.ioff()
             plt.show()
 
 
-if __name__ == "main":
+if __name__ == "__main__":
     # Usage:
     # trainer = Trainer(
     #     model=model,

@@ -15,7 +15,7 @@ class DatasetNames(StrEnum):
     VEHICLEID = "VEHICLEID"
 
 
-def getImageStats(dataset: str) -> tuple[torch.Tensor, torch.Tensor]:
+def getImageStats(dataset: str) -> dict[str, torch.Tensor]:
     """
     Given a dataset, writes the key dataset statistics
     """
@@ -40,9 +40,10 @@ def getImageStats(dataset: str) -> tuple[torch.Tensor, torch.Tensor]:
     M /= len(image_paths)
     V /= len(image_paths)
 
-    torch.save({"mean": M, "stdv": V}, Path(f"./classes/{dataset}.pt"))
+    torch.save({"mean": M, "stdv": V}, Path(
+        __file__).parent / f"./{dataset}.pt")
 
-    return M, V
+    return {"mean": M, "stdv": V}
 
 
 if __name__ == "__main__":
