@@ -1,7 +1,8 @@
-dataset: null
+dataset: DMV
 name: null
-lr: 0.001
 optimizer: Adam
+params:
+    lr: 0.001
 split:
     train: 80
     val: 10
