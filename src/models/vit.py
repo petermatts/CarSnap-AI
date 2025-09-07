@@ -24,7 +24,6 @@ class VIT(nn.Module):
                 nn.Linear(768, self.latent_dim),
                 nn.ReLU(),
                 nn.Linear(self.latent_dim, num_classes),
-                nn.Softmax(dim=1)
             ) for num_classes in self.num_classes
         ])
 

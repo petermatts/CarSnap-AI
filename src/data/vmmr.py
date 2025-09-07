@@ -1,4 +1,4 @@
-from torch import Tensor, load, float32
+from torch import tensor, Tensor, load, float32
 from torch.utils.data import Dataset
 from torchvision.io import decode_image
 from torchvision.transforms import Compose
@@ -6,7 +6,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 from glob import glob
-import numpy as np
+import yaml
 from pandas import read_csv, DataFrame
 if __package__ or "." in __name__:
     from .stats import getImageStats
@@ -19,7 +19,7 @@ class VMMRdb(Dataset):
         load_dotenv(Path(__file__).parent / "../../.env")
 
         self.CSV_PATH = Path(__file__).parent / "./VMMR.csv"
-        self.NPZ_PATH = Path(__file__).parent / "./VMMR.npz"
+        self.YML_PATH = Path(__file__).parent / "./VMMR.yml"
         self.root_dir = Path(os.getenv("DATA_PATH")
                              or str(Path(__file__).parent.parent)).absolute() / "VMMR"
 
@@ -44,10 +44,10 @@ class VMMRdb(Dataset):
         image = decode_image(data["Image"]).to(float32)
 
         label = (
-            Tensor(1*(self.classes["Brands"] == data["Brand"])),
-            Tensor(1*(self.classes["Models"] == data["Model"])),
-            Tensor(1*(self.classes["Years"] == data["Year"])),
-            Tensor(1*(self.classes["Trims"] == data["Trim"]))
+            tensor(self.classes["Brands"][data["Brand"]]),
+            tensor(self.classes["Models"][data["Model"]]),
+            tensor(self.classes["Years"][data["Year"]]),
+            tensor(self.classes["Trims"][data["Trim"]])
         )
 
         if self.transforms is not None:
@@ -58,10 +58,11 @@ class VMMRdb(Dataset):
     def _index_file(self) -> tuple[DataFrame, dict]:
         if self.CSV_PATH.exists() and not self.clean:
             df = read_csv(self.CSV_PATH, dtype=str).fillna("")
-            if not self.NPZ_PATH.exists():
-                data = self._write_npz(df)
+            if not self.YML_PATH.exists():
+                data = self._write_yml(df)
             else:
-                data = np.load(self.NPZ_PATH)
+                with open(self.YML_PATH, "r") as f:
+                    data = yaml.safe_load(f)
         else:
             paths = glob(f"{self.root_dir}/**/*.jpg", recursive=True)
             brand, model, trim, year = list(
@@ -76,21 +77,22 @@ class VMMRdb(Dataset):
                 "Trim": trim
             }, dtype=str)
 
-            data = self._write_npz(df)
+            data = self._write_yml(df)
 
             df.to_csv(self.CSV_PATH, index=False)
 
         return df, data
 
-    def _write_npz(self, df: DataFrame) -> dict:
+    def _write_yml(self, df: DataFrame) -> dict:
         data = {
-            "Brands": np.array(df["Brand"].unique().tolist()),
-            "Models": np.array(df["Model"].unique().tolist()),
-            "Years": np.array(df["Year"].unique().tolist()),
-            "Trims": np.array(df["Trim"].unique().tolist())
+            "Brands": {label: idx for idx, label in enumerate(df["Brand"].unique().tolist())},
+            "Models": {label: idx for idx, label in enumerate(df["Model"].unique().tolist())},
+            "Years": {label: idx for idx, label in enumerate(df["Year"].unique().tolist())},
+            "Trims": {label: idx for idx, label in enumerate(df["Trim"].unique().tolist())}
         }
-        np.savez(self.NPZ_PATH, Brands=data["Brands"],
-                 Models=data["Models"], Years=data["Years"], Trims=data["Trims"])
+
+        with open(self.YML_PATH, "w") as f:
+            yaml.dump(data, f)
 
         return data
 
@@ -125,6 +127,6 @@ if __name__ == "__main__":
     print(ds.num_classes())
     item, targets = ds.__getitem__(0)
     # print(item)
-    # print(targets)
+    print(targets)
 
     print(VMMRdb.getStats())
