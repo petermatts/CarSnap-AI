@@ -44,10 +44,11 @@ class VMMRdb(Dataset):
         image = decode_image(data["Image"]).to(float32)
 
         label = (
+            # ! only doing brands for now
             tensor(self.classes["Brands"][data["Brand"]]),
-            tensor(self.classes["Models"][data["Model"]]),
-            tensor(self.classes["Years"][data["Year"]]),
-            tensor(self.classes["Trims"][data["Trim"]])
+            # tensor(self.classes["Models"][data["Model"]]),
+            # tensor(self.classes["Years"][data["Year"]]),
+            # tensor(self.classes["Trims"][data["Trim"]])
         )
 
         if self.transforms is not None:

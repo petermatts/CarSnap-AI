@@ -92,7 +92,7 @@ def expirement(config: Config):
     ])
     # dataset = DMV_Cars(transform=transform)
     dataset = dataset_class(transform=transform)
-    train, val, test = getDataSplit(dataset, batch_size=16)
+    train, val, test = getDataSplit(dataset, batch_size=1)
 
     model = VIT(num_classes=dataset.num_classes())
     model.to(dev)

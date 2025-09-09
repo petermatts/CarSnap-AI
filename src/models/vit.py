@@ -29,5 +29,6 @@ class VIT(nn.Module):
 
     def forward(self, x):
         features = self.vit(x)
-        out = [classifier(features) for classifier in self.classifiers]
+        # out = [classifier(features) for classifier in self.classifiers]
+        out = self.classifiers[0](features)  # ! only doing brands for now
         return out

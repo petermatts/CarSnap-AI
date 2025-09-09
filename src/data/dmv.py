@@ -44,10 +44,11 @@ class DMV_Cars(Dataset):
         image = decode_image(data["Image"]).to(float32)
 
         label = (
+            # ! only doing brands for now
             tensor(self.classes["Brands"][data["Brand"]]),
-            tensor(self.classes["Models"][data["Model"]]),
-            tensor(self.classes["Years"][data["Year"]]),
-            tensor(self.classes["Colors"][data["Color"]])
+            # tensor(self.classes["Models"][data["Model"]]),
+            # tensor(self.classes["Years"][data["Year"]]),
+            # tensor(self.classes["Colors"][data["Color"]])
         )
 
         if self.transforms is not None:
