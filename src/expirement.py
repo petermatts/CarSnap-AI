@@ -8,10 +8,10 @@ from args import make_args
 import yaml
 from pathlib import Path
 import logging
-from data.dmv import DMV_Cars  # nopep8
-from data.vmmr import VMMRdb  # nopep8
-from models import VIT  # nopep8
-from resources import getOptimizer  # nopep8
+from data.dmv import DMV_Cars
+from data.vmmr import VMMRdb
+from models import VIT
+from resources import getOptimizer
 
 
 class Config:
